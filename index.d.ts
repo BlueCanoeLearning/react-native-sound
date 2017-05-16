@@ -56,7 +56,8 @@ declare module "react-native-sound" {
          *
          * If an initialization error is encountered (e.g. file not found), error will be an object containing code, description, and the stack trace.
          */
-        constructor(fileName: (string | ImageURISource), path?: string, onLoad: onSoundLoad);
+        constructor(fileName: (string | ImageURISource), onLoad?: onSoundLoad);
+        constructor(fileName: (string | ImageURISource), path?: string, onLoad?: onSoundLoad);
 
         /**
          * Return `true` if the sound has been loaded.
