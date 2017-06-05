@@ -10,11 +10,11 @@ function isRelativePath(path) {
   return !/^(\/|http(s?))/.test(path);
 }
 
-function Sound(filename, basePath, onError) {
+function Sound(filename, basePath, onLoad) {
   var asset = resolveAssetSource(filename);
   if (asset) {
     this._filename = asset.uri;
-    onError = basePath;
+    onLoad = basePath;
   } else {
     this._filename = basePath ? basePath + '/' + filename : filename;
 
@@ -43,7 +43,7 @@ function Sound(filename, basePath, onError) {
     if (error === null) {
       this._loaded = true;
     }
-    onError && onError(error);
+    onLoad && onLoad(error,props);
   });
 }
 
