@@ -6,7 +6,6 @@
 
 declare module "react-native-sound" {
     import React from "react";
-    import { ImageURISource } from "react-native";
 
     export interface SoundProperties {
         duration: number;
@@ -44,7 +43,7 @@ declare module "react-native-sound" {
         public static setCategory(category: SoundCategory, mixWithOthers?: boolean): void;
 
         /**
-         * `filename` {string | ImageURISource} Either absolute or relative path to the sound file or opaque value returned from require()
+         * `filename` {string | number} Either absolute or relative path to the sound file or opaque value returned from require()
          *
          * `basePath` {?string} Optional base path of the file.
          * Omit this or pass '' if filename is an absolute path.
@@ -56,8 +55,8 @@ declare module "react-native-sound" {
          *
          * If an initialization error is encountered (e.g. file not found), error will be an object containing code, description, and the stack trace.
          */
-        constructor(fileName: (string | ImageURISource), onLoad?: onSoundLoad);
-        constructor(fileName: (string | ImageURISource), path?: string, onLoad?: onSoundLoad);
+        constructor(fileName: (string | number), onLoad?: onSoundLoad);
+        constructor(fileName: (string | number), path?: string, onLoad?: onSoundLoad);
 
         /**
          * Return `true` if the sound has been loaded.
