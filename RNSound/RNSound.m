@@ -8,6 +8,7 @@
 
 @implementation RNSound {
   NSMutableDictionary* _playerPool;
+  NSMutableArray* _interruptedPlayerPool;
   NSMutableDictionary* _callbackPool;
 }
 
@@ -16,6 +17,14 @@
     _playerPool = [NSMutableDictionary new];
   }
   return _playerPool;
+}
+
+
+-(NSMutableArray*) interruptedPlayerPool {
+    if (!_interruptedPlayerPool) {
+        _interruptedPlayerPool = [NSMutableArray new];
+    }
+    return _interruptedPlayerPool;
 }
 
 -(NSMutableDictionary*) callbackPool {
@@ -55,6 +64,38 @@
   }
 }
 
+- (void) handleInterruption: (NSNotification*)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    if (!userInfo) return;
+    NSNumber *typeValue = [userInfo objectForKey:AVAudioSessionInterruptionTypeKey];
+     if (!typeValue) return;
+    AVAudioSessionInterruptionType type = [typeValue integerValue];
+    if (type == AVAudioSessionInterruptionTypeBegan) {
+        // Interruption began, all sounds playing will be added to a list of interrupted sounds
+        for (AVAudioPlayer* player in [self playerPool]) {
+            if (player.isPlaying) {
+                [player pause];
+                [[self interruptedPlayerPool] addObject:player];
+            }
+        }
+    } else if (type == AVAudioSessionInterruptionTypeEnded) {
+        NSNumber *optionsValue = [userInfo objectForKey:AVAudioSessionInterruptionOptionKey];
+        if (!optionsValue) return;
+        AVAudioSessionInterruptionOptions options = [optionsValue integerValue];
+        
+        for (AVAudioPlayer* player in [self interruptedPlayerPool]) {
+            if (options == AVAudioSessionInterruptionOptionShouldResume) {
+                // if playback was interrupted, resume playback if resumable
+                [player play];
+            } else {
+                // otherwise, player did not finish playing
+                [self audioPlayerDidFinishPlaying:player successfully:false];
+            }
+        }
+        [[self interruptedPlayerPool] removeAllObjects];
+    }
+}
+
 RCT_EXPORT_MODULE();
 
 -(NSDictionary *)constantsToExport {
@@ -70,6 +111,16 @@ RCT_EXPORT_METHOD(enable:(BOOL)enabled) {
   AVAudioSession *session = [AVAudioSession sharedInstance];
   [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers  error: nil];
   [session setActive: enabled error: nil];
+    if (enabled) {
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(handleInterruption:)
+                                                     name: AVAudioSessionInterruptionNotification
+                                                   object: session];
+    } else {
+        [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                        name: AVAudioSessionInterruptionNotification
+                                                      object: session];
+    }
 }
 
 RCT_EXPORT_METHOD(setCategory:(NSString *)categoryName
@@ -99,7 +150,7 @@ RCT_EXPORT_METHOD(setCategory:(NSString *)categoryName
 
   if (category) {
     if (mixWithOthers) {
-        [session setCategory: category withOptions:AVAudioSessionCategoryOptionMixWithOthers error: nil];
+        [session setCategory: category withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers error: nil];
     } else {
       [session setCategory: category error: nil];
     }
@@ -148,6 +199,8 @@ RCT_EXPORT_METHOD(play:(nonnull NSNumber*)key withCallback:(RCTResponseSenderBlo
   if (player) {
     [[self callbackPool] setObject:[callback copy] forKey:key];
     [player play];
+  } else {
+      NSLog(@"[SOUND].play has no AVAudioPlayer");
   }
 }
 
@@ -160,12 +213,13 @@ RCT_EXPORT_METHOD(pause:(nonnull NSNumber*)key withCallback:(RCTResponseSenderBl
 }
 
 RCT_EXPORT_METHOD(stop:(nonnull NSNumber*)key withCallback:(RCTResponseSenderBlock)callback) {
-  AVAudioPlayer* player = [self playerForKey:key];
-  if (player) {
-    [player stop];
-    player.currentTime = 0;
-    callback(@[]);
-  }
+    AVAudioPlayer* player = [self playerForKey:key];
+    if (player) {
+        [player stop];
+        player.currentTime = 0;
+        callback(@[]);
+        [self audioPlayerDidFinishPlaying:player successfully:false];
+    }
 }
 
 RCT_EXPORT_METHOD(release:(nonnull NSNumber*)key) {
