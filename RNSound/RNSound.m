@@ -79,6 +79,14 @@
             }
         }
     } else if (type == AVAudioSessionInterruptionTypeEnded) {
+        NSError *error;
+        
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers  error: nil];
+        bool success = [session setActive: YES error: &error];
+
+        NSAssert(success, @"RNSound.handleInterruption failed in AVAudioSessionInterruptionTypeEnded block. This is a bug");
+        
         NSNumber *optionsValue = [userInfo objectForKey:AVAudioSessionInterruptionOptionKey];
         if (!optionsValue) return;
         AVAudioSessionInterruptionOptions options = [optionsValue integerValue];
