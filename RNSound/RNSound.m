@@ -72,12 +72,12 @@
     AVAudioSessionInterruptionType type = [typeValue integerValue];
     if (type == AVAudioSessionInterruptionTypeBegan) {
         // Interruption began, all sounds playing will be added to a list of interrupted sounds
-        for (AVAudioPlayer* player in [self playerPool]) {
+        [[self playerPool] enumerateKeysAndObjectsUsingBlock:^(NSNumber*  _Nonnull key, AVAudioPlayer*  _Nonnull player, BOOL * _Nonnull stop) {
             if (player.isPlaying) {
                 [player pause];
                 [[self interruptedPlayerPool] addObject:player];
             }
-        }
+        }];
     } else if (type == AVAudioSessionInterruptionTypeEnded) {
         NSError *error;
         
@@ -91,7 +91,7 @@
         if (!optionsValue) return;
         AVAudioSessionInterruptionOptions options = [optionsValue integerValue];
         
-        for (AVAudioPlayer* player in [self interruptedPlayerPool]) {
+        [[self interruptedPlayerPool] enumerateObjectsUsingBlock:^(AVAudioPlayer*  _Nonnull player, NSUInteger idx, BOOL * _Nonnull stop) {
             if (options == AVAudioSessionInterruptionOptionShouldResume) {
                 // if playback was interrupted, resume playback if resumable
                 [player play];
@@ -99,7 +99,7 @@
                 // otherwise, player did not finish playing
                 [self audioPlayerDidFinishPlaying:player successfully:false];
             }
-        }
+        }];
         [[self interruptedPlayerPool] removeAllObjects];
     }
 }
