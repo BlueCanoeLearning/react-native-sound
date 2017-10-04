@@ -91,7 +91,7 @@
         if (!optionsValue) return;
         AVAudioSessionInterruptionOptions options = [optionsValue integerValue];
         
-        [[self interruptedPlayerPool] enumerateKeysAndObjectsUsingBlock:^(NSNumber*  _Nonnull key, AVAudioPlayer*  _Nonnull player, BOOL * _Nonnull stop) {
+        [[self interruptedPlayerPool] enumerateObjectsUsingBlock:^(AVAudioPlayer*  _Nonnull player, NSUInteger idx, BOOL * _Nonnull stop) {
             if (options == AVAudioSessionInterruptionOptionShouldResume) {
                 // if playback was interrupted, resume playback if resumable
                 [player play];
