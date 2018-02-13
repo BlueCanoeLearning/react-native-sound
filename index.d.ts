@@ -46,7 +46,7 @@ declare module "react-native-sound" {
          * Enable the sound manager. Call this as early as possible (e.g. constructor)
          * @param enabled 
          */
-        public static enable(enabled: boolean);
+        public static enable(enabled: boolean): void;
 
         /**
          * `filename` {string | number} Either absolute or relative path to the sound file or opaque value returned from require()
