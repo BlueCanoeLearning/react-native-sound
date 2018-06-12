@@ -117,14 +117,14 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(enable:(BOOL)enabled) {
   AVAudioSession *session = [AVAudioSession sharedInstance];
-  [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers  error: nil];
-  [session setActive: enabled error: nil];
     if (enabled) {
+        [session setActive:YES error: nil];
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(handleInterruption:)
                                                      name: AVAudioSessionInterruptionNotification
                                                    object: session];
     } else {
+        [session setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error: nil];
         [[NSNotificationCenter defaultCenter] removeObserver: self
                                                         name: AVAudioSessionInterruptionNotification
                                                       object: session];
