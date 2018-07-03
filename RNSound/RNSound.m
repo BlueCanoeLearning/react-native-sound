@@ -12,6 +12,10 @@
   NSMutableDictionary* _callbackPool;
 }
 
++ (BOOL)requiresMainQueueSetup {
+    return NO;
+}
+
 -(NSMutableDictionary*) playerPool {
   if (!_playerPool) {
     _playerPool = [NSMutableDictionary new];
@@ -82,7 +86,7 @@
         NSError *error;
         
         AVAudioSession *session = [AVAudioSession sharedInstance];
-        [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers  error: nil];
+        [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDuckOthers error: nil];
         bool success = [session setActive: YES error: &error];
 
         NSAssert(success, @"RNSound.handleInterruption failed in AVAudioSessionInterruptionTypeEnded block. This is a bug");
@@ -158,7 +162,7 @@ RCT_EXPORT_METHOD(setCategory:(NSString *)categoryName
 
   if (category) {
     if (mixWithOthers) {
-        [session setCategory: category withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionMixWithOthers error: nil];
+        [session setCategory: category withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDuckOthers error: nil];
     } else {
       [session setCategory: category error: nil];
     }
