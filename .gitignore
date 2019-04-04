@@ -24,3 +24,13 @@ DerivedData
 *.xcuserstate
 # Jetbrains
 .idea
+
+### Android/IntelliJ
+build/
+.idea
+.gradle
+local.properties
+*.iml
+.classpath
+.project
+.settings
