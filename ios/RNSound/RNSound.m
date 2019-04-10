@@ -86,10 +86,8 @@
         NSError *error;
         
         AVAudioSession *session = [AVAudioSession sharedInstance];
-        [session setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDuckOthers error: nil];
         bool success = [session setActive: YES error: &error];
-
-        NSAssert(success, @"RNSound.handleInterruption failed in AVAudioSessionInterruptionTypeEnded block. This is a bug");
+        NSAssert(success, @"RNSound.handleInterruption failed in AVAudioSessionInterruptionTypeEnded block when attempting AVAudioSession.setActive. This is a bug");
         
         NSNumber *optionsValue = [userInfo objectForKey:AVAudioSessionInterruptionOptionKey];
         if (!optionsValue) return;
