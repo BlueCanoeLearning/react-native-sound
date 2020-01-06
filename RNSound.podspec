@@ -14,10 +14,6 @@ Pod::Spec.new do |s|
   s.requires_arc        = true
   s.platform            = :ios, "7.0"
   
-  s.dependency 'React/Core'
-  
-  s.subspec 'Core' do |ss|
-    ss.source_files     = "ios/RNSound/*.{h,m,swift}"
-  end
+  s.dependency 'React'
 
 end

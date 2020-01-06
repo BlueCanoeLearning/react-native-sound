@@ -17,13 +17,13 @@
   "author": "Zhen Wang <z@zmxv.com> (http://blog.zmxv.com)",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.59.3"
+    "react-native": ">=0.61.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
+    "@babel/core": "^7.6.2",
     "babel-core": "7.0.0-bridge.0",
-    "react": "16.8.3",
-    "react-native": "0.59.3"
+    "react": "16.9.0",
+    "react-native": "0.61.5"
   },
   "dependencies": {}
 }
