@@ -164,6 +164,7 @@ RCT_EXPORT_METHOD(setCategory:(NSString *)categoryName
     } else {
       [session setCategory: category error: nil];
     }
+    [session setActive: YES error: nil];
   }
 }
 
